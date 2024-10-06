@@ -3,6 +3,7 @@ import { allPages } from "@/.contentlayer/generated"
 import '@next/env'
 import RSS from 'rss';
 
+/*
 export const metadata: Metadata = {
   title: process.env.RSS_META_TITLE,
   description: process.env.RSS_META_DESC,
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
     },
   }
 };
-
+*/
 
 const feed = new RSS({
   title: process.env.RSS_TITLE,
