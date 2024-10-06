@@ -16,10 +16,10 @@ export const metadata: Metadata = {
 */
 
 const feed = new RSS({
-  title: process.env.RSS_TITLE,
-  description: process.env.RSS_DESC,
-  site_url: process.env.RSS_SITE_URL,
-  feed_url: process.env.RSS_FEED_URL,
+  title: 'foo',
+  description: 'process.env.RSS_DESC',
+  site_url: 'process.env.RSS_SITE_URL',
+  feed_url: 'process.env.RSS_FEED_URL',
   copyright: `${new Date().getFullYear()} ${process.env.RSS_COPYRIGHT_MSG}`,
   language: 'en',
   pubDate: new Date(),
