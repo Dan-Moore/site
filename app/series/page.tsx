@@ -2,11 +2,14 @@ import { allPosts } from "@/.contentlayer/generated"
 import Link from "next/link"
 
 export default function Home() {
-    var found = [];
+    var found: any[]
   return (
     <div className="prose dark:prose-invert">
       {allPosts
           .filter((post) => {
+              if(found === undefined) {
+                  found = [];
+                  }
               const isSeries = (post.series !== undefined);
 
               if(!found.includes(post.series) && isSeries){
