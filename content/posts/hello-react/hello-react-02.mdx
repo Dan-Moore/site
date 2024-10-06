@@ -1,0 +1,54 @@
+---
+title: Hello React! Part 2 - Implementing Environment Variables
+description: Series on building a website with react and hosting it on GitHub Pages.
+published_date: "2024-10-05"
+modified_date: "2024-10-05"
+---
+
+# Implementing Environment Variables
+The template is barebones and a couple of steps are needed for creating server and client side environment variables.
+
+First, we will need a .env file on the root directory.  It's a simple configuratin file where the entries are key-value pairs with an '=' operator for value assignment.
+
+```
+# Site Map Variables
+SITE_MAP_URL=https://daniel-moore.net
+
+# RSS Feed Variables
+RSS_SITE_TITLE=Daniel Moore
+RSS_SITE_DESCRIPTION=Software Development Blog
+RSS_SITE_URL=https://daniel-moore.net
+RSS_FEED_URL=https://daniel-moore.net/rss.xml
+```
+
+Next we will need an envConfig.tsx file created in the /app directory.
+```tsx
+import { loadEnvConfig } from '@next/env'
+ 
+const projectDir = process.cwd()
+loadEnvConfig(projectDir)
+```
+
+Now we should all set to start using the environment variables on the server side.  
+Snippet below shows a simple use case on how to write the import and use the environment variable defined in the .env file.
+```tsx
+import '@next/env'
+
+const url = process.env.SITE_MAP_URL
+```
+
+Client side environments need to be defined in the next.config.js file in the root directory.
+```js
+const { withContentlayer } = require("next-contentlayer");
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  env: {
+    foo: 'bar',
+  }
+};
+
+module.exports = withContentlayer(nextConfig);
+```
