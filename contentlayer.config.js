@@ -30,6 +30,12 @@ export const Page = defineDocumentType(() => ({
     modified_date: {
       type: "date",
     },
+    topic: {
+      type: "string",
+    },
+    hide_rss: {
+      type: "boolean",
+    },
     draft: {
       type: "boolean",
     },
@@ -49,11 +55,17 @@ export const Post = defineDocumentType(() => ({
     description: {
       type: "string",
     },
+    series: {
+      type: "string",
+    },
     published_date: {
       type: "date",
     },
     modified_date: {
       type: "date",
+    },
+    hide_rss: {
+      type: "boolean",
     },
     draft: {
       type: "boolean",

@@ -1,42 +1,57 @@
 ---
-title: Hello React! Part 3 - Creating a sitemap
+title: Hello React! Part 3 - Implementing Environment Variables
 description: Series on building a website with react and hosting it on GitHub Pages.
+series: Hello React!
 published_date: "2024-10-05"
 modified_date: "2024-10-05"
 ---
 
-# Creating A Site Map
-A [sitemap](https://www.sitemaps.org/) is a xml file that contains meta data about the webpage, along with page links.   
-We can make sitemap in the /app directory by creating a file called 'sitemap.tsx'.  
+# Implementing Environment Variables
+The template is barebones and a couple of steps are needed for creating server and client side environment variables.
 
-In this example, I'm getting all the contentlayer objects generated from the markdown files within the /content directory and building a new xml document.
+First, we will need a .env file on the root directory.  It's a simple configuration file where the entries are key-value pairs with an '=' operator for value assignment.
 
+```
+# Site Map Variables
+SITE_MAP_URL=https://daniel-moore.net
+
+# RSS Feed Variables
+RSS_SITE_TITLE=Daniel Moore
+RSS_SITE_DESCRIPTION=Software Development Blog
+RSS_SITE_URL=https://daniel-moore.net
+RSS_FEED_URL=https://daniel-moore.net/rss.xml
+```
+
+Next we will need an envConfig.tsx file created in the /app directory.
 ```tsx
-import { MetadataRoute } from 'next'
-import { allPosts } from "@/.contentlayer/generated"
-import { allPages } from "@/.contentlayer/generated"
+import { loadEnvConfig } from '@next/env'
 
+const projectDir = process.cwd()
+loadEnvConfig(projectDir)
+```
+
+Now we should all set to start using the environment variables on the server side.
+Snippet below shows a simple use case on how to write the import and use the environment variable defined in the .env file.
+```tsx
 import '@next/env'
 
-
-export default function sitemap(): MetadataRoute.Sitemap {
-  // Sample entry in the sitemap.xml
-  /*<url>
-      <loc>https://daniel-moore.net/pages/about</loc>
-      <lastmod>2023-01-02T00:00:00.000Z</lastmod>
-    </url>*/
-  const pagesRoutes = allPages
-  .map((page) => ({
-    url: `${process.env.SITE_MAP_URL}${page.slug}`,
-    lastModified: page.modified_date || page.published_date,
-  }))
-
-  const postRoutes = allPosts
-    .map((post) => ({
-      url: `${process.env.SITE_MAP_URL}${post.slug}`,
-      lastModified: post.modified_date || post.published_date,
-    }))
-
-  return [...pagesRoutes, ...postRoutes]
-}
+const url = process.env.SITE_MAP_URL
 ```
+
+Client side environments need to be defined in the next.config.js file in the root directory.
+```js
+const { withContentlayer } = require("next-contentlayer");
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  env: {
+    foo: 'bar',
+  }
+};
+
+module.exports = withContentlayer(nextConfig);
+```
+
+### [Continue to Part 4](/posts/hello-react/hello-react-04)

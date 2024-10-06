@@ -1,20 +1,3 @@
----
-title: Hello React! Part 3 - Creating a sitemap
-description: Series on building a website with react and hosting it on GitHub Pages.
-series: Hello React!
-published_date: "2024-10-05"
-modified_date: "2024-10-05"
----
-
-# Creating A Site Map
-A [sitemap](https://www.sitemaps.org/) is a xml file that contains meta data about the webpage, along with page links.
-TODO: Fill out
-
-## Coding a Site Map in React
-We can make sitemap in the /app directory by creating a file called 'sitemap.tsx'.
-In this example, I'm getting all the contentlayer objects generated from the markdown files within the /content directory and building a new xml document.
-
-```tsx
 import { MetadataRoute } from 'next'
 import { allPosts } from "@/.contentlayer/generated"
 import { allPages } from "@/.contentlayer/generated"
@@ -41,7 +24,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [...pageUrls, ...postUrls]
 }
-}
-```
-
-### [Continue to Part 5](/posts/hello-react/hello-react-05)

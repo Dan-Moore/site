@@ -1,54 +1,149 @@
 ---
-title: Hello React! Part 2 - Implementing Environment Variables
+title: Hello React! Part 2 - Site Design
 description: Series on building a website with react and hosting it on GitHub Pages.
+series: Hello React!
 published_date: "2024-10-05"
 modified_date: "2024-10-05"
 ---
 
-# Implementing Environment Variables
-The template is barebones and a couple of steps are needed for creating server and client side environment variables.
+# Site Design on Pages and Posts
+Created links to [Pages](/pages), [Series](/series), and [Posts](/posts) in the web page header.
 
-First, we will need a .env file on the root directory.  It's a simple configuratin file where the entries are key-value pairs with an '=' operator for value assignment.
+TODO: web pages are still wip.  I'll circle back here
+## ContentLayer Scheme
+Post and Pages objects internal fields are nearly identical, only minor differance is that posts have a 'series' field and pages has a 'topics'
 
-```
-# Site Map Variables
-SITE_MAP_URL=https://daniel-moore.net
-
-# RSS Feed Variables
-RSS_SITE_TITLE=Daniel Moore
-RSS_SITE_DESCRIPTION=Software Development Blog
-RSS_SITE_URL=https://daniel-moore.net
-RSS_FEED_URL=https://daniel-moore.net/rss.xml
-```
-
-Next we will need an envConfig.tsx file created in the /app directory.
+1. series
+    > Series display name. This field is needed when working with posts contained in an internal folder in the /content/posts/ directory.
+2. topics
+    > Subject topics the page write-up is covering.
+3. published_date
+    > Date of publication.  Can be a future date, in such cases it act's like the post is in draft status.
+4. modified_date
+    > Date of the last edit made to the page.  Hard coded atm, not sure how if I can populate it dynamically with the last commit time stamp.
+5. hide_rss
+    > Boolean flag to hide a post or page from the RSS feed.  Made this variable for hiding [About](/about) from the out going feed.
+6. draft
+    > Boolean flag to prevent the page from being published and displayed on the site.
 ```tsx
-import { loadEnvConfig } from '@next/env'
- 
-const projectDir = process.cwd()
-loadEnvConfig(projectDir)
+export const Post = defineDocumentType(() => ({
+  name: "Post",
+  filePathPattern: `posts/**/*.mdx`,
+  contentType: "mdx",
+  fields: {
+    title: {
+      type: "string",
+      required: true,
+    },
+    description: {
+      type: "string",
+    },
+    series: {
+      type: "string",
+    },
+    published_date: {
+      type: "date",
+    },
+    modified_date: {
+      type: "date",
+    },
+    hide_rss: {
+      type: "boolean",
+    },
+    draft: {
+      type: "boolean",
+    },
+  },
+  computedFields,
+}))
 ```
 
-Now we should all set to start using the environment variables on the server side.  
-Snippet below shows a simple use case on how to write the import and use the environment variable defined in the .env file.
+## Pages
+For now, I'm only returning a feed of all published pages.
+There isn't much content beside some lorem ipsum pages, still need to figure out how I want to design and display any write-ups.
 ```tsx
-import '@next/env'
+import { allPages } from "@/.contentlayer/generated"
+import Link from "next/link"
 
-const url = process.env.SITE_MAP_URL
+export default function Pages() {
+    const found_topics = [];
+  return (
+    <div className="prose dark:prose-invert">
+      {allPages
+          .filter((post) => !post.draft && post.title != 'About')
+          .map((page) => (
+        <article key={page._id}>
+          <Link href={page.slug}>
+            <h2>{page.title}</h2>
+          </Link>
+          {page.description && <p>{page.description}</p>}
+        </article>
+      ))}
+    </div>
+  )
+}
 ```
 
-Client side environments need to be defined in the next.config.js file in the root directory.
-```js
-const { withContentlayer } = require("next-contentlayer");
+## Posts
+Similar to Pages, but this page will probably just be a feed of all published blog posts.  Need to add pagenation and a few other QOL features.
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  env: {
-    foo: 'bar',
-  }
-};
+```tsx
+import { allPosts } from "@/.contentlayer/generated"
+import Link from "next/link"
 
-module.exports = withContentlayer(nextConfig);
+export default function Home() {
+  return (
+    <div className="prose dark:prose-invert">
+      {allPosts
+          .filter((post) => !post.draft)
+          .map((post) => (
+        <article key={post._id}>
+          <Link href={post.slug}>
+            <h2>{post.title}</h2>
+          </Link>
+          {post.description && <p>{post.description}</p>}
+        </article>
+      ))}
+    </div>
+  )
+}
 ```
+
+## Series
+The series page is similar to the posts page, but just limits output to the first blog post of any given series.
+```tsx
+import { allPosts } from "@/.contentlayer/generated"
+import Link from "next/link"
+
+export default function Home() {
+    const found = []
+  return (
+    <div className="prose dark:prose-invert">
+      {allPosts
+          .filter((post) => {
+              const isSeries = (post.series !== undefined);
+
+              if(!found.includes(post.series) && isSeries){
+                  found.push(post.series);
+                  return true;
+              }
+
+           return !post.draft && isSeries && !found.includes(post.series)
+           })
+          .map((post) => (
+        <article key={post._id}>
+          <Link href={post.slug}>
+            <h2>{post.title}</h2>
+          </Link>
+          {post.description && <p>{post.description}</p>}
+        </article>
+      ))}
+    </div>
+  )
+}
+```
+
+## About
+This page is just my background with software development and tech in general.
+
+### [Continue to Part 3](/posts/hello-react/hello-react-03)

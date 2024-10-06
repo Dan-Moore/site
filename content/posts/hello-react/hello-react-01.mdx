@@ -1,6 +1,7 @@
 ---
 title: Hello React! Part 1 - Building and Hosting a React app on GitHub Pages
 description: Series on building a website with react and hosting it on GitHub Pages.
+series: Hello React!
 published_date: "2024-10-05"
 modified_date: "2024-10-05"
 ---
@@ -14,6 +15,49 @@ and maintain web pages purely in markdown.
 
 I ran into some issues with deploying the application with the pnpm package manager that comes with template by default and reverted to npm.
 
+## Migrating to NPM
+By default, the template bundled with pnpm as the package manager.
+Switching back to npm is pretty straight forward.
+1. Delete node_modules directory
+2. Delete pnpm_lock.yaml
+3. Review package.json or any other script file makes reference to pnpm and update with npm
+
+With working with the template dependencies, I triggered a dependency conflict breaking the npm install & update commands.
+```sh
+npm error code ERESOLVE
+npm error ERESOLVE unable to resolve dependency tree
+npm error
+npm error While resolving: next-contentlayer@0.1.0
+npm error Found: next@14.2.14
+npm error node_modules/next
+npm error   next@"^14.2.14" from the root project
+npm error
+npm error Could not resolve dependency:
+npm error peer next@"^12 || ^13" from next-contentlayer@0.3.4
+npm error node_modules/next-contentlayer
+npm error   next-contentlayer@"^0.3.2" from the root project
+npm error
+npm error Fix the upstream dependency conflict, or retry
+npm error this command with --force or --legacy-peer-deps
+npm error to accept an incorrect (and potentially broken) dependency resolution.
+npm error
+npm error
+npm error For a full report see:
+npm error <local_path>/.npm/_logs/2024-10-06T16_32_46_807Z-eresolve-report.txt
+npm error A complete log of this run can be found in: <local_path>/.npm/_logs/2024-10-06T16_32_46_807Z-debug-0.log
+```
+
+This line of the stack trace gives a optional tag to use with the CLI command to make it work.
+```sh
+npm error Fix the upstream dependency conflict, or retry
+npm error this command with --force or --legacy-peer-deps
+```
+
+As workaround to avoid having to use it as CLI optional argument, I updated the npm config to force legacy-peer-deps to always be true.
+
+```sh
+npm config set legacy-peer-deps true
+```
 
 ## Creating a Workflow for GitHub Actions
 With GitHub Actions we can setup CI/CD pipeline and making one is a breeze.  There is a built-in tool to scan the repository and
@@ -21,14 +65,16 @@ generate a workflow file based on what tech stack you used.  In this case, the t
 
 While on the Github, navigate to the settings tab for the repository that you want deploy.
 
-Change the Source to 'GitHub Actions'. After you make the change, a scan will take place and a workflow will be created for the project.
+Change the Source to 'GitHub Actions'.  After you make the change, a scan will take place and a workflow will be created for the project.
 ![Settings Page](/posts/hello-world/GitHub_Pages.png)
 
-Review the generated workflow file, we will need to make an edit the 'Setup Pages' action in the build process.  I had to
-remove with statement it comes with by default.  Works fine without it.
+Review the generated workflow file.  I had to make an edit within the 'Setup Pages' action in the build process.
+This action had a 'with' statement that was breaking the build process.
 ```yml
       - name: Setup Pages
         uses: actions/configure-pages@v5
 ```
 
-### [Continue to Part 2](http://localhost:3000/posts/hello-react/hello-react-02)
+
+
+### [Continue to Part 2](https://daniel-moore.net/posts/hello-react/hello-react-02)
