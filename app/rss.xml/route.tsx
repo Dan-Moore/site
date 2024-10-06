@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 */
 
 const feed = new RSS({
-  title: 'foo',
+  title: `${process.env.RSS_TITLE}`,
   description: process.env.RSS_DESC,
   site_url: `${process.env.RSS_SITE_URL}`,
   feed_url: `${process.env.RSS_FEED_URL}`,
@@ -35,7 +35,7 @@ export async function GET() {
         guid: `${process.env.BASE_PATH}${post.slug}`,
         url: `${process.env.BASE_PATH}${post.slug}`,
         date: new Date(),
-        description: 'post.description',
+        description: `${post.description}`,
         author: 'Daniel Moore',
       });
     });
