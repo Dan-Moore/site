@@ -27,8 +27,10 @@ const feed = new RSS({
 
 export async function GET() {
     // Adding entries on the feed.
-    allPosts.map((post) => {
-      feed.item({
+    allPosts
+      .filter((post) => !post.draft && !post.hide_rss)
+        .map((post) => {
+            feed.item({
         title: post.title,
         guid: `${process.env.BASE_PATH}${post.slug}`,
         url: `${process.env.BASE_PATH}${post.slug}`,
