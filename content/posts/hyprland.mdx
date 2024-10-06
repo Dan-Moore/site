@@ -1,0 +1,35 @@
+---
+title: Arch Linux with Hyprland
+description: Quick Start Running Hyprland on Arch Linux
+published_date: "2024-12-05"
+modified_date: "2024-12-05"
+---
+
+# Arch Linux with Hyprland
+[Hyprland - Arch Wiki](https://wiki.archlinux.org/title/Hyprland) is a popular tiling manager that's easy to get started
+with by sharing dot files.
+
+
+Here is [KooL's Arch-Hyprland](https://github.com/JaKooLit/Arch-Hyprland) dot file, you can install it by running the falling commands.
+Once you execute this, Hyprland should be configured, installed and running.
+```sh
+git clone --depth=1 https://github.com/JaKooLit/Arch-Hyprland.git ~/Arch-Hyprland
+cd ~/Arch-Hyprland
+chmod +x install.sh
+./install.sh
+```
+
+## Quick Start on Keybinds
+```
+(Super/Windows Key) + H - Displays help window with common key binds.
+(Super/Windows Key) + Shift + # Window Num - Moves window to new workspace.
+(Super/Windows Key) + F - Floats the current window.
+```
+
+## Config
+
+Most of the present's will probably require some ricing.  The .config/waybar directory contains a config file for the ui.
+```sh
+cd ~/.config/waybar
+nano config
+```
