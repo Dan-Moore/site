@@ -34,7 +34,7 @@ export async function GET() {
         title: post.title,
         guid: `${process.env.BASE_PATH}${post.slug}`,
         url: `${process.env.BASE_PATH}${post.slug}`,
-        date: post.published_date,
+        date: new Date(),
         description: post.description,
         author: 'Daniel Moore',
       });
