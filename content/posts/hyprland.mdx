@@ -1,17 +1,17 @@
 ---
 title: Arch Linux with Hyprland
-description: Quick Start Running Hyprland on Arch Linux
-published_date: "2024-12-05"
-modified_date: "2024-12-05"
+description: Installing Hyprland on Arch Linux.
+published_date: "2024-10-06"
+modified_date: "2024-10-06"
 ---
 
 # Arch Linux with Hyprland
 [Hyprland - Arch Wiki](https://wiki.archlinux.org/title/Hyprland) is a popular tiling manager that's easy to get started
-with by sharing dot files.
+with by sharing dot files.  Check out [Hyprland's Hall of Fame](https://hyprland.org/hall_of_fame/) for show cases of hyprland dot files.
 
 
-Here is [KooL's Arch-Hyprland](https://github.com/JaKooLit/Arch-Hyprland) dot file, you can install it by running the falling commands.
-Once you execute this, Hyprland should be configured, installed and running.
+[KooL's Arch-Hyprland](https://github.com/JaKooLit/Arch-Hyprland) has a public dot file you can test out Hyprland.
+Running this command will configure and install hyprland for an arch machine.
 ```sh
 git clone --depth=1 https://github.com/JaKooLit/Arch-Hyprland.git ~/Arch-Hyprland
 cd ~/Arch-Hyprland
@@ -26,9 +26,8 @@ chmod +x install.sh
 (Super/Windows Key) + F - Floats the current window.
 ```
 
-## Config
-
-Most of the present's will probably require some ricing.  The .config/waybar directory contains a config file for the ui.
+## Waybar Config
+The Waybar is the menu bar of Hyprland, you can edit the config with this command.
 ```sh
 cd ~/.config/waybar
 nano config
