@@ -6,7 +6,7 @@ export default function Pages() {
   return (
     <div className="prose dark:prose-invert">
       {allPages
-          .filter((post) => !post.draft && post.title != 'About')
+          .filter((page) => !page.draft && page.slug.includes('About'))
           .map((page) => (
         <article key={page._id}>
           <Link href={page.slug}>
