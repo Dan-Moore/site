@@ -9,7 +9,7 @@ modified_date: "2024-10-05"
 # Hello React!
 This website is hosted on Github Pages and makes use of GitHub Actions for automated build and deployments.
 
-[Shadcn's Next-ContentLayer](https://github.com/shadcn/next-contentlayer) is a skeleton project that's pre-configured with ContentLayer to use .mdx files.  Main benefit is using this template is for creating a static site that's written in markdown.
+[Shadcn's Next-ContentLayer](https://github.com/shadcn/next-contentlayer) is a skeleton project that's pre-configured with ContentLayer to use .mdx files.  Main benefit of this template, is that I can start writing content markdown while develop features for this static site.
 
 
 ## Migrating to NPM
@@ -23,12 +23,10 @@ Switching back to npm is pretty straight forward.
 
 
 ## Creating a Workflow for GitHub Actions
-With GitHub Actions we can setup CI/CD pipeline and making one is a breeze.  There is a built-in tool to scan the repository and
-generate a workflow file based on what tech stack you used.  In this case, the tool created a workflow file for a .Next.js application.
+With GitHub Actions, we can setup CI/CD pipeline and making one is a breeze.  There is a built-in tool that scans the repo and then generates a workflow file for you.  
 
-While on the Github, navigate to the settings tab for the repository that you want deploy.
-
-Change the Source to 'GitHub Actions'.  After you make the change, a scan will take place and a workflow will be created for the project.
+Open up the settings page for your github repo you want create a workflow file. 
+Navigate to the Page section, and change the source to 'GitHub Actions'.  After you make the change, a scan will take place and a workflow will be created for the project.
 ![Settings Page](/posts/hello-world/GitHub_Pages.png)
 
 Review the generated workflow file.  I had to make an edit within the 'Setup Pages' action in the build process.
@@ -37,7 +35,5 @@ This action had a 'with' statement that was breaking the build process.
       - name: Setup Pages
         uses: actions/configure-pages@v5
 ```
-
-
 
 ### [Continue to Part 2](https://daniel-moore.net/posts/hello-react/hello-react-02)
