@@ -1,24 +1,12 @@
 import { allPosts } from "@/.contentlayer/generated"
 import Link from "next/link"
+import {getFirstEntryOfSeries} from "@/components/contentlayer-util"
 
 export default function Home() {
     var found: any[]
   return (
     <div className="prose dark:prose-invert">
-      {allPosts
-          .filter((post) => {
-              if(found === undefined) {
-                  found = [];
-                  }
-              const isSeries = (post.series !== undefined);
-
-              if(!found.includes(post.series) && isSeries){
-                  found.push(post.series);
-                  return true;
-              }
-
-           return !post.draft && isSeries && !found.includes(post.series)
-           })
+      {getFirstEntryOfSeries()
           .map((post) => (
         <article key={post._id}>
           <Link href={post.slug}>

@@ -1,14 +1,138 @@
 ---
-title: Hello React! Part 2 - Site Design
+title: Site Design
 description: Series on building a website with react and hosting it on GitHub Pages.
-series: Hello React!
-published_date: "2024-10-05"
-modified_date: "2024-10-05"
+publish: "10/7/2024"
+modified: "10/7/2024"
+series: 
+  title: Hello React!
+  description: Series on building and hosted a static website with react.
+  index: 2
 ---
 
 # Site Design
-Most of my design decisions will be by around how I use [contentlayer.config.js](https://github.com/Dan-Moore/site/blob/main/contentlayer.config.js).
-This config file contains the scheme files for the objects and defines what my project's objects and defines how I use them.
+Most of my design decisions will be focused around how I use [contentlayer.config.js](https://github.com/Dan-Moore/site/blob/main/contentlayer.config.js).
+This config file contains the scheme files for the objects and the directory path to run a scan.  
+
+With a single import, a collection of posts objects based on the .MDX files in the '/content/posts/' directory.
+```tsx
+import { allPosts } from "@/.contentlayer/generated"
+```
+
+## Page and Post Objects
+MDX files stored within '/content/pages' and '/content/posts' directories will be generated as either a Page or Post object. 
+
+The body of the .MDX file can be passed into the server component with this command:
+```tsx
+<Mdx code={post.body.code} />
+```
+
+### Pages
+Pages are stand alone write-ups that fall outside of being a blog posts.
+If the page is located within a nested directory, the inner folder becomes a topic associated with the page.
+
+```tsx
+/**
+ * Page object created from .mdx file found within the '/pages' directory. 
+ */
+export const Page = defineDocumentType(() => ({
+/**
+ * Shared fields used between Pages and Post objects.
+ */
+const globals = {
+  /**
+   * Title of the <Page|Post>.
+   */
+  title: {
+    type: "string",
+    required: true,
+  },
+  /**
+   * Brief description of the <Page|Post>. 
+   */
+  description: {type: "string",},
+  /**
+   * Status of the <Page|Post>
+   *  - draft: <Page|Post> is still being worked on and not set for publication
+   *  - publish: <Page|Post> is set to be published
+   *  - hide: <Page|Post> is set to be hidden on the RSS feed.
+   */
+  status: {
+    type: "enum",
+    options: ["draft", "publish", "hide"],
+    default: "draft"
+  },
+  /**
+   * Keywords tags associated with the <Page|Post>.
+   */
+  tags: { 
+    type: 'list', 
+    of: { type: 'string' }, 
+    default: [] 
+  },
+  /**
+   * Date of publication. Future dates are accepted, but will block publishing the <Page|Post>.
+   */
+  published_date: {
+    type: "date",
+    default: new Date().toLocaleDateString(),
+  },
+  /**
+   * Date of last modification.  Tracks the last edit on a <Page|Post> .
+   */
+  modified_date: {
+    type: "date",
+    default: new Date().toLocaleDateString(),
+  },
+}
+
+/**
+ * Page object created from .mdx file found within the '/pages' directory. 
+ */
+export const Page = defineDocumentType(() => ({
+  name: "Page",
+  filePathPattern: `pages/**/*.mdx`,
+  contentType: "mdx",
+  fields: globals,
+  computedFields,
+}))
+```
+
+### Post
+Blog posts can be grouped together in a series, or a singular blog post.
+```tsx
+/**
+ * Post object created from .mdx file found within the '/posts' directory. 
+ * Posts can be grouped together into a series.
+ */
+export const Post = defineDocumentType(() => ({
+  name: "Post",
+  filePathPattern: `posts/**/*.mdx`,
+  contentType: "mdx",
+  // Using the spread operator to merge in the global fields.
+  fields: {...{
+    /**
+     * Title of the series
+     */
+    series_title: {type: "string",},
+    /**
+     * Brief description of the Series
+     */
+    series_description: {type: "string",},
+    
+    /**
+     * Series Index - Number of where the Post falls in the series 
+     */
+    series_index:{
+      type: "number",
+      default: 0,
+    },
+
+  }, ...globals },
+  computedFields,
+}))
+```
+
+
 
 ## ContentLayer Field Descriptions
 Page and Post is my two main objects and they share many of the same fields.
@@ -18,60 +142,39 @@ Field values can be assigned in the header of the .mdx files
 ---
 title: Hello React! Part 2 - Site Design
 description: Series on building a website with react and hosting it on GitHub Pages.
-series: Hello React!
-published_date: "2024-10-05"
-modified_date: "2024-10-05"
+series_title: Hello React!
+series_description: Series on building and hosted a static website with react.
+series_index: 1
+published_date: "10/7/2024"
+modified_date: "10/7/2024"
 ---
 ```
 
-1. series
-    > Series display name. This field is needed when working with posts contained in an internal folder in the /content/posts/ directory.
-2. topics
-    > Subject topics the page write-up is covering.
-3. published_date
-    > Date of publication.  Can be a future date, in such cases it act's like the post is in draft status.
-4. modified_date
-    > Date of the last edit made to the page.  Hard coded atm, not sure how if I can populate it dynamically with the last commit time stamp.
-5. hide_rss
-    > Boolean flag to hide a post or page from the RSS feed.  Made this variable for hiding [About](/about) from the out going feed.
-6. draft
-    > Boolean flag to prevent the page from being published and displayed on the site.
 
----
-
-### Scheme
+## Post and Page Utility Class
+Re-usable functions for Post and Page objects are exposed in '/components/contentlayer-util.tsx' 
 ```tsx
-export const Post = defineDocumentType(() => ({
-  name: "Post",
-  filePathPattern: `posts/**/*.mdx`,
-  contentType: "mdx",
-  fields: {
-    title: {
-      type: "string",
-      required: true,
-    },
-    description: {
-      type: "string",
-    },
-    series: {
-      type: "string",
-    },
-    published_date: {
-      type: "date",
-    },
-    modified_date: {
-      type: "date",
-    },
-    hide_rss: {
-      type: "boolean",
-    },
-    draft: {
-      type: "boolean",
-    },
-  },
-  computedFields,
-}))
+/**
+* Checks if the given article set in draft mode and if the given published date is in the future. 
+* @param content Either Post or Page 
+* @returns boolean
+*/
+export function isPublished(content: Post | Page) {
+    if(content.status === "draft"){ 
+      return false; 
+    }
+
+    // published_date is in iso format.  
+    // Making new date obj for current date comparison.
+    if(content.published_date !== undefined && new Date(content.published_date) > new Date()) {
+      return false;
+    }
+
+    return true;
+}
 ```
 
+
+---
 
 ### [Continue to Part 3](/posts/hello-react/hello-react-03)

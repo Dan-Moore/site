@@ -1,5 +1,5 @@
-import { allPosts } from "@/.contentlayer/generated"
-import { allPages } from "@/.contentlayer/generated"
+import {getRssArticles} from "@/components/contentlayer-util";
+
 import '@next/env'
 import RSS from 'rss';
 
@@ -27,29 +27,16 @@ const feed = new RSS({
 
 export async function GET() {
     // Adding entries on the feed.
-    allPosts
-      .filter((post) => !post.draft && !post.hide_rss)
-        .map((post) => {
-            feed.item({
-        title: post.title,
-        guid: `${process.env.BASE_PATH}${post.slug}`,
-        url: `${process.env.BASE_PATH}${post.slug}`,
-        date: `${post.published_date}`,
-        description: `${post.description}`,
-        author: 'Daniel Moore',
-      });
-    });
 
-    allPages
-      .filter((page) => !page.draft && !page.hide_rss)
-      .map((page) => {
+    getRssArticles()
+      .map((article) => {
         feed.item({
-            title: page.title,
-            guid: `${process.env.BASE_PATH}${page.slug}`,
-            url: `${process.env.BASE_PATH}${page.slug}`,
-                    date: `${page.published_date}`,
-                    description: `${page.description}`,
-                    author: 'Daniel Moore',
+            title: article.title,
+            guid: `${process.env.BASE_PATH}${article.slug}`,
+            url: `${process.env.BASE_PATH}${article.slug}`,
+                    date: `${article.publish}`,
+                    description: `${article.description}`,
+                    author: 'Dan Moore',
                   });
                 });
 
