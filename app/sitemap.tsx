@@ -13,13 +13,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   .map((page) => ({
     // Slug comes pre-appended with '/' in path
     url: `${process.env.SITE_MAP_URL}${page.slug}`,
-    lastModified: page.modified_date || page.published_date,
+    lastModified: page.modified || page.modified,
   }))
 
   const postUrls = allPosts
     .map((post) => ({
       url: `${process.env.SITE_MAP_URL}${post.slug}`,
-      lastModified: post.modified_date || post.published_date,
+      lastModified: post.modified || post.modified,
     }))
 
   return [...pageUrls, ...postUrls]

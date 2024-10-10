@@ -1,22 +1,32 @@
 import { Post, Page,  } from "@/.contentlayer/generated";
 import { allPosts, allPages } from "@/.contentlayer/generated"
 
+/** 
+ * This file contains code for directly working with generated content from ContentLayer
+ */
+
+
 /**
- * Collection of flag types
+ * Collection of flag that can be added to a MDX article header.
+ * Sample use case would be adding hide_rss & hide_web flags on the 'About' 
  */
 export const FlagTypes = {
   /**
-   * Flag to hide an article on the RSS feed.
+   * Flag prevents a mdx article from appearing on the RSS feed.
    */
   HIDE_RSS: "hide_rss",
   /**
-   * Flag to hide an article on the site map.
+   * Flag prevents a mdx article from appearing within sitemap.xml.
    */
   HIDE_SITEMAP: "hide_sitemap",
   /**
-   * Flag to hide an article on the web page.
+   * Flag prevents a mdx article to be published to the web site.   
    */
-  HIDE_WEB: "hide",
+  HIDE_WEB: "hide_web",
+  /**
+   * Flag prevents to ignore a mdx article everywhere.
+   */
+  HIDE: "hide_all",
 }
 
 /**
@@ -25,15 +35,20 @@ export const FlagTypes = {
 export const ArticleStatus = {
   DRAFT: "draft", 
   PUBLISH: "publish", 
-  HIDE: "hide",
 }
 
-export function getHomePage(){
-  return {
+/**
+ * Collection of articles for the home page
+ * @returns 
+ */
+export function getHomePageArticles(){
+  const articles = [
     ...getPublishPages(), 
     ...getPublishSeries(), 
     ...getPublishPosts(),
-  }.filter((article: Page | Post) => (containsFlag(article, FlagTypes.HIDE_WEB))).sort(compareDates);
+  ]
+
+  return articles.filter((article: Page | Post) => (!containsFlag(article, FlagTypes.HIDE_WEB))).sort(compareDates);
 }
 
 /**
@@ -71,7 +86,7 @@ export function getPublishPages() {
 /**
  * Returns a collection of articles ready for publication.
  * Article with a future publication date, will be treated as drafts.
- * @param articles 
+ * @param articles Post or Page object
  */
 function getPublish(articles: Post[] | Page[] | any[]) {
   return articles.filter((article) => !isPublished(article)).sort(compareDates);
@@ -80,33 +95,39 @@ function getPublish(articles: Post[] | Page[] | any[]) {
 
 /**
  * Returns a collection of article for the RSS feed. 
- * @param article 
+ * @param article Post or Page object
  */
 export function getRssArticles() {
-  return {
+  const articles = [
     ...getPublishPages(), 
     ...getPublishSeries(), 
     ...getPublishPosts(),
-  }.filter((article: Page | Post) => (containsFlag(article, FlagTypes.HIDE_RSS) || containsFlag(article, FlagTypes.HIDE_WEB))).sort(compareDates);
+  ]
+  return articles.filter((article: Page | Post) => (containsFlag(article, FlagTypes.HIDE_RSS) || containsFlag(article, FlagTypes.HIDE_WEB))).sort(compareDates);
 }
 
 /**
  * Returns a collection of article for the sitemap xml doc. 
- * @param article 
+ * @param article Post or Page object
  */
 export function getSiteMapArticles() {
-  return {
+  // Getting a list of pages, series and posts.
+  const articles = [
     ...getPublishPages(), 
     ...getPublishSeries(), 
     ...getPublishPosts(),
-  }.filter((article: Page | Post) => (containsFlag(article, FlagTypes.HIDE_SITEMAP) || containsFlag(article, FlagTypes.HIDE_WEB))).sort(compareDates);
+  ]
+  return articles.filter((article: Page | Post) => (containsFlag(article, FlagTypes.HIDE_SITEMAP) || containsFlag(article, FlagTypes.HIDE_WEB))).sort(compareDates);
 }
 
 /**
- * 
- * @param xArticle 
- * @param yArticle 
- * @returns 
+ * Returns a date comparison between two articles.
+ *   - If xArticle was published before yArticle, then -1.
+ *   - If xArticle was published after yArticle, then 1.
+ *   - If xArticle published date equals yArticle, then 0.
+ * @param xArticle Post or Page object
+ * @param yArticle Post or Page object
+ * @returns boolean
  */
 function compareDates(xArticle : Post | Page, yArticle : Post | Page) {
   if(
@@ -127,56 +148,56 @@ function compareDates(xArticle : Post | Page, yArticle : Post | Page) {
 
 /**
  * Checks if the article is in draft status
- * @param article 
+ * @param article Post or Page object
  * @returns boolean
  */
 export function isDraft(article: Post | Page) {
-  // Returning false if status is missing or in another state besides 'draft'
+  // Returning false if 
+  //  1. Status is missing  
+  //  2. In another state besides 'draft' 
+  //  3. Contains the hide flag
   if(
-      article.status === undefined || 
-      (article.status !== ArticleStatus.DRAFT && article.status !== ArticleStatus.HIDE)) {
+      article.status === undefined || article.status !== ArticleStatus.DRAFT || containsFlag(article, FlagTypes.HIDE)
+    ){
     return false;
   }
 
-  // If publication timestamp is a future date, forcing a draft status.   
+  // When timestamp is a future date, forcing to draft status.   
   if(article.publish !== undefined && new Date(article.publish) > new Date()) {
     return false;
   }
-
   return true;
 }
 
 
 /**
 * Checks if the article is published
-* @param article Either Post or Page object
+* @param article Post or Page object
 * @returns boolean
 */
 export function isPublished(article: Post | Page) {
     if(isDraft(article)){
       return false;
     }
-
     return (article.status !== undefined && article.status === ArticleStatus.PUBLISH);
 }
 
 
 /**
  * Check if the article belongs to a series.
- * @param article 
+ * @param article Post or Page object
  * @returns boolean
  */
 export function isSeries (post: Post) {
   if(post.series === undefined) {
     return false;
   }
-
   return true;
 }
 
 /**
  * Checks if the article contains the given flag name
- * @param article 
+ * @param article Post or Page object
  * @param flagName Name of the flag, i.e. hide_rss
  */
 export function containsFlag(article: Post | Page, flagName: string){
@@ -185,8 +206,5 @@ export function containsFlag(article: Post | Page, flagName: string){
       return true; // Found the given flag.
     }
   }
-
   return false;
 }
-
-
