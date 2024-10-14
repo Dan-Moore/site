@@ -6,7 +6,7 @@ jobs:
     
       - uses: actions/checkout@v4
       - run: |
-          python ./lib/foo.py
+          python ./lib/frontmatter.py
           # Note: the following account information will not work on GHES
           
           git config user.name "github-actions[bot]"
